@@ -5,17 +5,11 @@ from google.genai import types
 
 # 1. Setup API Client
 # Try to get the key from either common environment variable name
+
 api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 if not api_key:
     raise ValueError("GEMINI_API_KEY environment variable is not set.")
-
-if not api_key:
-    # This print will show up in your GitHub Action logs to help you debug
-    print("Error: No API key found in environment variables.")
-    # List available keys (excluding values) to see what GitHub sees
-    print(f"Available keys: {[k for k in os.environ.keys() if 'API' in k]}")
-    exit(1)
-
+    
 client = genai.Client(api_key=api_key)
 
 # 2. Define the context
@@ -40,10 +34,13 @@ Ensure 'Last Updated: {current_date}' is at the top.
 print(f"Fetching updates for {current_date} using google-genai...")
 
 response = client.models.generate_content(
-    model='gemini-2.5-flash', # Or gemini-2.0-pro when available
+    model='gemini-3.1-pro-preview',
     contents=prompt,
     config=types.GenerateContentConfig(
-        tools=[types.Tool(google_search=types.GoogleSearchRetrieval())]
+        tools=[types.Tool(google_search=types.GoogleSearchRetrieval())],
+        # Optional: You can tell the model to "think harder" 
+        # for complex technical stack analysis
+        thinking_config={'include_thoughts': True} if "pro" in "gemini-3.1-pro" else None
     )
 )
 
