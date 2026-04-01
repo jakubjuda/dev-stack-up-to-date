@@ -21,9 +21,9 @@ jobs:
 
       - name: Run Scraper with uv
         # 'uv run' will automatically handle dependencies if defined in the script
+        run: uv run generate_readme.py
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: uv run generate_readme.py
 
       - name: Commit and Push
         run: |
