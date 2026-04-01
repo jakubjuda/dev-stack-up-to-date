@@ -1,4 +1,4 @@
-name: Daily Ranking Scrape
+name: Weekly README.md update
 on:
   schedule:
     - cron: '15 4 * * 1'
