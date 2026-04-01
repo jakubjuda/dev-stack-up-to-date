@@ -4,9 +4,17 @@ from google import genai
 from google.genai import types
 
 # 1. Setup API Client
-api_key = os.getenv("GEMINI_API_KEY")
+# Try to get the key from either common environment variable name
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 if not api_key:
     raise ValueError("GEMINI_API_KEY environment variable is not set.")
+
+if not api_key:
+    # This print will show up in your GitHub Action logs to help you debug
+    print("Error: No API key found in environment variables.")
+    # List available keys (excluding values) to see what GitHub sees
+    print(f"Available keys: {[k for k in os.environ.keys() if 'API' in k]}")
+    exit(1)
 
 client = genai.Client(api_key=api_key)
 
