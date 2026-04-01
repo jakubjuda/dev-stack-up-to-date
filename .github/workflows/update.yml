@@ -18,7 +18,12 @@ jobs:
           enable-cache: true # Speeds up subsequent runs even more
           # The version of Python to set UV_PYTHON to
           python-version: "3.14.3"
-
+          
+      - name: Debug Secret
+        run: echo "Key length is ${#GEMINI_API_KEY}"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          
       - name: Run Scraper with uv
         # 'uv run' will automatically handle dependencies if defined in the script
         env:
@@ -26,7 +31,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: uv run generate_readme.py
-        
+      
       - name: Commit and Push
         run: |
           git config --global user.name "GitHub Action Bot"
