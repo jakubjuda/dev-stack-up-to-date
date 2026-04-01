@@ -6,6 +6,7 @@ on:
 jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
+    environment: ${{ vars.GEMINI_API_KEY }}
     permissions:
       contents: write
     steps:
