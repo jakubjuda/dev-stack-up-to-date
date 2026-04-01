@@ -2,6 +2,7 @@ name: Weekly README.md update
 on:
   schedule:
     - cron: '15 4 * * 1'
+  workflow_dispatch: # Allows you to run it manually from the Actions tab
 jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
