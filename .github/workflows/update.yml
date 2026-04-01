@@ -1,7 +1,7 @@
 name: Daily Ranking Scrape
 on:
   schedule:
-    - cron: '15 4 */7 * *'
+    - cron: '15 4 * * 1'
 jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
@@ -20,6 +20,8 @@ jobs:
 
       - name: Run Scraper with uv
         # 'uv run' will automatically handle dependencies if defined in the script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: uv run generate_readme.py
 
       - name: Commit and Push
@@ -27,5 +29,5 @@ jobs:
           git config --global user.name "GitHub Action Bot"
           git config --global user.email "actions@github.com"
           git add README.md
-          git commit -m "Update README.md: $(date +'%Y-%m-%d')" || exit 0
+          git commit -m "docs: weekly stack refresh ($GITHUB_RUN_ID)" || echo "No changes found"
           git push
