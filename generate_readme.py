@@ -34,7 +34,7 @@ Ensure 'Last Updated: {current_date}' is at the top.
 print(f"Fetching updates for {current_date} using google-genai...")
 
 response = client.models.generate_content(
-    model='gemini-3.1-pro-preview',
+    model='gemini-2.5-pro',
     contents=prompt,
     config=types.GenerateContentConfig(
         tools=[types.Tool(google_search=types.GoogleSearchRetrieval())],
