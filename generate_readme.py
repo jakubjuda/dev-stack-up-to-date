@@ -9,10 +9,14 @@ from google.genai import types
 api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 if not api_key:
     raise ValueError("GEMINI_API_KEY environment variable is not set.")
-    
+
 client = genai.Client(api_key=api_key)
 
-# 2. Define the context
+# 2. Filter for 'pro' models and sort to find the latest
+pro_models = [m.name for m in models if 'pro' in m.name and 'latest' not in m.name]
+latest_pro = sorted(pro_models)[-1] if pro_models else "gemini-2.5-pro"
+
+# 3. Define the context
 current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
 prompt = f"""
@@ -30,11 +34,11 @@ Format with professional Markdown: use tables, bold terms, and clear sections.
 Ensure 'Last Updated: {current_date}' is at the top.
 """
 
-# 3. Generate content with Google Search Grounding
+# 4. Generate content with Google Search Grounding
 print(f"Fetching updates for {current_date} using google-genai...")
 
 response = client.models.generate_content(
-    model='gemini-2.5-pro',
+    model=latest_pro,
     contents=prompt,
     config=types.GenerateContentConfig(
         tools=[types.Tool(google_search=types.GoogleSearchRetrieval())],
@@ -44,7 +48,7 @@ response = client.models.generate_content(
     )
 )
 
-# 4. Save to README.md
+# 5. Save to README.md
 with open("README.md", "w", encoding="utf-8") as f:
     f.write(response.text)
 
