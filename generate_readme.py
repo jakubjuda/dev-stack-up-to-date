@@ -13,6 +13,7 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 
 # 2. Filter for 'pro' models and sort to find the latest
+models = client.models.list()
 pro_models = [m.name for m in models if 'pro' in m.name and 'latest' not in m.name]
 latest_pro = sorted(pro_models)[-1] if pro_models else "gemini-2.5-pro"
 
