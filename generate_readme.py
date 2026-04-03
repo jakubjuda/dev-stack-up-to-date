@@ -36,7 +36,7 @@ Ensure 'Last Updated: {current_date}' is at the top.
 """
 
 # 4. Generate content with Google Search Grounding
-print(f"Fetching updates for {current_date} using google-genai...")
+print(f"Fetching updates for {current_date} using {latest_pro}")
 
 response = client.models.generate_content(
     model=latest_pro,
