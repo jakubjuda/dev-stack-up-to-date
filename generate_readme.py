@@ -15,11 +15,10 @@ client = genai.Client(api_key=api_key)
 # 2. Filter for 'pro' models and sort to find the latest
 models = client.models.list()
 pro_models = [
-    m.model_id for m in models 
-    if 'pro' in m.model_id.lower() 
-    and 'latest' not in m.model_id.lower()
-    and not any(x in (m.model_id + getattr(m, 'description', '')).lower() for x in ['image', 'banana'])
-    and 'generateContent' in getattr(m, 'supported_generation_methods', [])
+    getattr(m, 'name', getattr(m, 'model_id', "")) for m in models 
+    if 'pro' in getattr(m, 'name', getattr(m, 'model_id', "")).lower() 
+    and 'latest' not in getattr(m, 'name', getattr(m, 'model_id', "")).lower()
+    and not any(x in (getattr(m, 'name', "") + getattr(m, 'description', "")).lower() for x in ['image', 'banana'])
 ]
 latest_pro = sorted(pro_models)[-1] if pro_models else "gemini-2.5-pro"
 
