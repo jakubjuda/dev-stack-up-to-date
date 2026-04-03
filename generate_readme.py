@@ -26,19 +26,43 @@ latest_pro = sorted(pro_models)[-1] if pro_models else "gemini-2.5-pro"
 current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
 prompt = f"""
+Act as a Senior Principal Engineer and Technical Writer. 
 Today is {current_date}. 
-Search for the latest updates in the Python, DevOps, and Data Engineering ecosystems 
-specifically for Linux (WSL2, Docker, or Native) and macOS.
 
-Generate a high-quality, professional README.md content. 
-Focus on:
-- Releases in Python (e.g., UV, Ruff, or FastAPI).
-- Trends in Data Engineering (e.g., Polars, DuckDB, or Orchestrators like Dagster/Prefect).
-- DevOps tools for 2026 (e.g., OpenTofu, Dagger, or new Docker features).
+Your task is to perform a deep-scan synthesis of the {current_date[:4]} tech landscape and generate an elite-level README.md.
 
-Format with professional Markdown: use tables, bold terms, and clear sections.
-Ensure 'Last Updated: {current_date}' is at the top.
+### GOAL
+Create the definitive "State of the Stack" guide for developers on Linux (WSL2/Docker/Native) and macOS.
+
+### CRITICAL FOCUS AREAS:
+1. **Python Ecosystem (The "Speed & Tooling" Era):** Detail updates on high-performance tooling (UV, Ruff, Mojo interop) and modern frameworks like FastAPI or Pydantic.
+2. **Data Engineering (The "Local-First & OLAP" Trend):** Focus on the shift toward Polars, DuckDB, and modern orchestration (Dagster/Prefect/Temporal).
+3. **DevOps & Infrastructure (The "Platform Engineering" Shift):** Cover OpenTofu, Dagger.io, and {current_date[:4]}-specific Docker/Podman features for local development.
+
+### FORMATTING REQUIREMENTS:
+- **Header:** Start with `# 🚀 Developer Stack: {current_date[:4]} Edition` followed by `> Last Updated: {current_date}`.
+- **Comparison Tables:** Include a "Legacy vs. Modern" table for each section (e.g., Pip vs. UV, Airflow vs. Dagster).
+- **Setup Snippets:** Provide 1-line CLI examples for the most important new tool in each category.
+- **Visual hierarchy:** Use bold terms for emphasis, callout quotes for "Top Trend to Watch," and clear nested lists.
+
+### TONE:
+Professional, authoritative, and concise. Avoid fluff; provide actionable technical insights.
 """
+
+# prompt = f"""
+# Today is {current_date}. 
+# Search for the latest updates in the Python, DevOps, and Data Engineering ecosystems 
+# specifically for Linux (WSL2, Docker, or Native) and macOS.
+
+# Generate a high-quality, professional README.md content. 
+# Focus on:
+# - Releases in Python (e.g., UV, Ruff, or FastAPI).
+# - Trends in Data Engineering (e.g., Polars, DuckDB, or Orchestrators like Dagster/Prefect).
+# - DevOps tools for 2026 (e.g., OpenTofu, Dagger, or new Docker features).
+
+# Format with professional Markdown: use tables, bold terms, and clear sections.
+# Ensure 'Last Updated: {current_date}' is at the top.
+# """
 
 # 4. Generate content with Google Search Grounding
 print(f"Fetching updates for {current_date} using {latest_pro}")
@@ -48,9 +72,6 @@ response = client.models.generate_content(
     contents=prompt,
     config=types.GenerateContentConfig(
         tools=[types.Tool(google_search=types.GoogleSearchRetrieval())],
-        # Optional: You can tell the model to "think harder" 
-        # for complex technical stack analysis
-        thinking_config={'include_thoughts': True} if "pro" in "gemini-3.1-pro" else None
     )
 )
 
