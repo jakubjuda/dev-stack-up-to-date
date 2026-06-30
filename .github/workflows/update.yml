@@ -2,7 +2,7 @@ name: Weekly README.md update
 on:
   schedule:
     - cron: '15 4 * * 1'
-  workflow_dispatch: # Allows you to run it manually from the Actions tab
+  #workflow_dispatch: # Allows you to run it manually from the Actions tab
 jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
@@ -10,14 +10,14 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           enable-cache: true # Speeds up subsequent runs even more
           # The version of Python to set UV_PYTHON to
-          python-version: "3.14.3"
+          python-version: "3.14.6"
           
       - name: Run Scraper with uv
         # 'uv run' will automatically handle dependencies if defined in the script
