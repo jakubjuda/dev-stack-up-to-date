@@ -12,17 +12,9 @@ if not api_key:
 
 client = genai.Client(api_key=api_key)
 
-# 2. Filter for 'pro' models and sort to find the latest
-models = client.models.list()
-pro_models = [
-    getattr(m, 'name', '') for m in models
-    if getattr(m, 'name', '').startswith('models/gemini')
-    and 'pro' in getattr(m, 'name', '').lower()
-    and not any(x in getattr(m, 'name', '').lower() for x in ['image', 'lyria', 'banana'])
-]
-latest_pro = sorted(pro_models)[-1] if pro_models else "gemini-2.5-pro"
+latest_pro = "gemini-pro-latest"
 
-# 3. Define the context
+# 2. Define the context
 current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
 prompt = f"""
@@ -58,18 +50,18 @@ Each of the 5 focus areas MUST contain the following elements in order:
 Professional, authoritative, and concise. Avoid fluff; provide actionable technical insights
 """
 
-# 4. Generate content with Google Search Grounding
+# 3. Generate content with Google Search Grounding
 print(f"Fetching updates for {current_date} using {latest_pro}")
 
 response = client.models.generate_content(
     model=latest_pro,
     contents=prompt,
     config=types.GenerateContentConfig(
-        tools=[types.Tool(google_search=types.GoogleSearchRetrieval())],
+        tools=[types.Tool(google_search=types.GoogleSearch())],
     )
 )
 
-# 5. Save to README.md
+# 4. Save to README.md
 with open("README.md", "w", encoding="utf-8") as f:
     f.write(response.text)
 
