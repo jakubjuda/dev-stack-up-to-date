@@ -38,7 +38,15 @@ Create the definitive "State of the Stack" guide for developers on Linux (WSL2/D
 1. **Python Ecosystem (The "Speed & Tooling" Era):** Detail updates on high-performance tooling (UV, Ruff, Mojo interop) and modern frameworks like FastAPI or Pydantic.
 2. **AI/LLM Integration (The "Agentic Framework" Era):** Focus on production-grade AI tools like PydanticAI, LangChain/LangGraph, and local LLM orchestration (Ollama/vLLM) for developers.
 3. **Data Engineering (The "Local-First & OLAP" Trend):** Focus on the shift toward Polars, DuckDB, and modern orchestration (Dagster/Prefect/Temporal).
-4. **DevOps & Infrastructure (The "Platform Engineering" Shift):** Cover OpenTofu, Dagger.io, and 2026-specific Docker/Podman features for local development.
+4. **DevOps & Infrastructure (The "Platform Engineering" Shift):** Cover OpenTofu, Dagger.io, and the latest Docker/Podman features for local development.
+5. **Data Platform Engineering (The "Open Lakehouse & Interoperability" Era):** Focus on the infrastructure underpinning modern analytics, specifically multi-engine table formats (Apache Iceberg, Delta Lake), unified REST catalog standards (Apache Polaris, Unity Catalog), and high-performance in-memory data movement (Apache Arrow/Flight).
+
+### REQUIRED SECTION STRUCTURE:
+Each of the 5 focus areas MUST contain the following elements in order:
+- High-level overview of current paradigm shifts.
+- **Legacy vs. Modern Table** with columns: `Legacy Tool` | `Modern Alternative` | `Key Advantage`.
+- **Top Trend to Watch** formatted as a blockquote (`> ...`).
+- **1-Line Setup Snippet** providing a concise, copy-pasteable CLI command suitable for macOS/WSL2.
 
 ### FORMATTING REQUIREMENTS:
 - **Header:** Start with `# 🚀 Developer Stack: {current_date[:4]} Edition` followed by `> Last Updated: {current_date}`.
@@ -47,23 +55,8 @@ Create the definitive "State of the Stack" guide for developers on Linux (WSL2/D
 - **Visual hierarchy:** Use bold terms for emphasis, callout quotes for "Top Trend to Watch," and clear nested lists.
 
 ### TONE:
-Professional, authoritative, and concise. Avoid fluff; provide actionable technical insights.
+Professional, authoritative, and concise. Avoid fluff; provide actionable technical insights
 """
-
-# prompt = f"""
-# Today is {current_date}. 
-# Search for the latest updates in the Python, DevOps, and Data Engineering ecosystems 
-# specifically for Linux (WSL2, Docker, or Native) and macOS.
-
-# Generate a high-quality, professional README.md content. 
-# Focus on:
-# - Releases in Python (e.g., UV, Ruff, or FastAPI).
-# - Trends in Data Engineering (e.g., Polars, DuckDB, or Orchestrators like Dagster/Prefect).
-# - DevOps tools for 2026 (e.g., OpenTofu, Dagger, or new Docker features).
-
-# Format with professional Markdown: use tables, bold terms, and clear sections.
-# Ensure 'Last Updated: {current_date}' is at the top.
-# """
 
 # 4. Generate content with Google Search Grounding
 print(f"Fetching updates for {current_date} using {latest_pro}")
