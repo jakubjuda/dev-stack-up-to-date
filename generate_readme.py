@@ -47,7 +47,7 @@ Each of the 5 focus areas MUST contain the following elements in order:
 - **Visual hierarchy:** Use bold terms for emphasis, callout quotes for "Top Trend to Watch," and clear nested lists.
 
 ### TONE:
-Professional, authoritative, and concise. Avoid fluff; provide actionable technical insights
+Professional, authoritative, and concise. Avoid fluff; provide actionable technical insights.
 """
 
 # 3. Generate content with Google Search Grounding
