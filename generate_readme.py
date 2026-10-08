@@ -32,6 +32,8 @@ Create the definitive "State of the Stack" guide for developers on Linux (WSL2/D
 3. **Data Engineering (The "Local-First & OLAP" Trend):** Focus on the shift toward Polars, DuckDB, and modern orchestration (Dagster/Prefect/Temporal).
 4. **DevOps & Infrastructure (The "Platform Engineering" Shift):** Cover OpenTofu, Dagger.io, and the latest Docker/Podman features for local development.
 5. **Data Platform Engineering (The "Open Lakehouse & Interoperability" Era):** Focus on the infrastructure underpinning modern analytics, specifically multi-engine table formats (Apache Iceberg, Delta Lake), unified REST catalog standards (Apache Polaris, Unity Catalog), and high-performance in-memory data movement (Apache Arrow/Flight).
+6. **Analytics Engineering & Semantic Layers (The "AI-Ready Metrics" Era):** Focus on headless semantic layers (dbt Semantic Layer/MetricFlow, Cube) and agentic analytics protocols (such as Model Context Protocol or MCP servers) that ensure AI agents query governed business metrics instead of hallucinating raw SQL.
+7. **Data Governance & Compliance (The "Active Metadata & Data Contracts" Era):** Focus on the evolution from passive documentation to active metadata platforms (Atlan, OpenMetadata), automated data contracts (preventing upstream pipeline breakages), and functional AI governance (tracking model training lineage and regulatory compliance).
 
 ### REQUIRED SECTION STRUCTURE:
 Each of the 5 focus areas MUST contain the following elements in order:
