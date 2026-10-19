@@ -12,7 +12,9 @@ if not api_key:
 
 client = genai.Client(api_key=api_key)
 
-latest_pro = "gemini-pro-latest"
+#temp set latest gemini pro model
+#latest_pro = "gemini-pro-latest"
+latest_pro = "gemini-4-argon"
 
 # 2. Define the context
 current_date = datetime.datetime.now().strftime("%Y-%m-%d")
