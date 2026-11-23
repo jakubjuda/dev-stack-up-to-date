@@ -1,191 +1,180 @@
 # 🚀 Developer Stack: 2026 Edition
-> Last Updated: 2026-11-16
+> Last Updated: 2026-11-23
 
-This reference architecture defines the production baseline for software, data, AI, and platform engineering across **Linux (Native / WSL2 / OCI Containers)** and **macOS (Apple Silicon)**. Across every layer of the stack, three macro-architectural forces dominate 2026: **Rust-compiled developer tooling**, **open multi-engine interoperability**, and **deterministic guardrails for autonomous AI systems**.
+This guide defines the production reference architecture for software, AI, infrastructure, and data engineers operating on **Linux (Native / WSL2 / Containers)** and **macOS (Apple Silicon)**. Across the 2026 stack, four structural forces dominate: **Rust-backed developer tooling**, **type-safe agentic runtimes**, **single-node vectorized OLAP over open table formats**, and **shift-left governance enforced in CI/CD**.
 
 ---
 
 ## 1. Python Ecosystem (The "Speed & Tooling" Era)
 
-Python remains the undisputed lingua franca for AI and backend orchestration, having shed its legacy packaging and static-analysis bottlenecks in favor of a unified, Rust-native toolchain and a modernized CPython 3.15 runtime.
+Python has shed its reputation for sluggish dependency management and interpreter bottlenecks by delegating tooling to Rust and compute-intensive hot paths to systems-level runtimes, alongside CPython's maturation of free-threaded (`no-GIL`) execution.
 
-* **Unified Toolchain Consolidation:**
-  * **Astral Ecosystem (`uv`, `ruff`, `ty`):** `uv` handles virtual environments, lockfiles, Python binary bootstrapping, and PEP 723 single-file scripts in milliseconds. `ruff` standardizes linting and formatting, while **Astral's `ty`** brings incremental, Rust-backed static type checking and LSP diagnostics at 10x–100x the speed of legacy checkers.
-  * **CPython 3.15 Runtime Advances:** Shipped in October 2026, Python 3.15 elevates **free-threaded execution (`python3.15t`)** out of experimental status alongside the `abi3t` Stable ABI for C extensions (PEP 803) and explicit **`lazy import`** syntax (PEP 810) to slash CLI and microservice cold-start latency.
-* **Systems Interop & High-Throughput APIs:**
-  * **Pydantic & FastAPI:** Pydantic's `pydantic-core` (Rust) powers zero-overhead schema validation at network boundaries, seamlessly paired with **FastAPI** for async I/O services.
-  * **Mojo & Rust Native Extensions:** Rather than rewriting entire services in C++, engineers offload SIMD/GPU-bound kernels to **Mojo** (via direct Python interop and MAX) or `PyO3`/`maturin` Rust bindings.
+* **Unified Project & Environment Management:** Astral’s **uv** has consolidated `pip`, `venv`, `pyenv`, `pipx`, and `poetry` into a single static binary capable of sub-second dependency resolution, universal lockfiles (`uv.lock`), inline script metadata, and ephemeral tool execution (`uvx`).
+* **Zero-Latency Static Analysis:** **Ruff** serves as the universal linter and formatter, replacing fragmented Python-based AST checkers with a single Rust pass.
+* **Hardware-Native Interop:** **Mojo** enables zero-copy interoperability with Python ecosystems, allowing engineers to rewrite compute-bound kernels with SIMD vectorization and vendor-agnostic GPU acceleration without maintaining brittle C++/CUDA bindings.
+* **Compiled Schema & API Foundations:** **FastAPI** paired with **Pydantic v2** (`pydantic-core` in Rust) remains the default contract layer for high-concurrency async microservices and validation pipelines.
 
 | Legacy Tool | Modern Alternative | Key Advantage |
 | :--- | :--- | :--- |
-| `pip` + `venv` + `poetry` + `pyenv` | **`uv`** | Single Rust binary for Python version management, deterministic lockfiles, and 10–100x faster dependency resolution. |
-| `flake8` + `black` + `isort` | **`ruff`** | Unified AST pass replacing dozens of linting and formatting plugins in sub-second CI runs. |
-| `mypy` / `Pyright` | **`ty`** | Fine-grained incremental Rust type checker and LSP delivering sub-10ms live editor diagnostics on large monorepos. |
-| `marshmallow` / manual dicts | **Pydantic (Rust Core)** | Rust-compiled serialization/validation with native JSON Schema generation for OpenAPI and LLM tool calling. |
-| Cython / SWIG C++ wrappers | **Mojo / `PyO3` (`maturin`)** | Memory-safe or hardware-accelerated native kernels with zero-boilerplate Python interoperability. |
+| `pip` + `venv` + `pyenv` + `Poetry` | **uv** | 10–100x faster Rust resolver; manages Python binaries, lockfiles, workspaces, and CLI tools in one binary. |
+| `Flake8` + `Black` + `isort` | **Ruff** | Unified 800+ rule linter and formatter executing in single-digit milliseconds. |
+| `Cython` / `ctypes` C-Extensions | **Mojo Interop** | Systems-level memory safety, SIMD, and GPU kernel authoring with Pythonic syntax. |
+| `Flask` + `Marshmallow` | **FastAPI** + **Pydantic v2** | Async-first OpenAPI generation backed by Rust-compiled validation schemas. |
 
-> **Top Trend to Watch — Free-Threaded CPython (`abi3t`) + Lazy Imports:** With PEP 803 establishing a stable ABI for no-GIL wheels (`python3.15t`) and PEP 810 deferring heavy module loads via `lazy import`, CPU-bound Python services can finally exploit true multi-core shared-memory parallelism without multiprocessing serialization taxes.
+> **Top Trend to Watch:** **Free-Threaded CPython (No-GIL) + Rust/Mojo Hybrid Runtimes** — Production adoption of free-threaded Python 3.13/3.14+ builds combined with Rust static type-checking (`ty`) and Mojo compute kernels is eliminating Python's multi-core scaling ceiling.
 
-**1-Line Setup Snippet (macOS / WSL2):**
+**1-Line Setup Snippet (macOS / WSL2):** Install the standalone `uv` toolchain without requiring a pre-existing Python installation:
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh && uv python install 3.15 && uv tool install ruff && uv tool install ty@latest
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ---
 
 ## 2. AI/LLM Integration (The "Agentic Framework" Era)
 
-The era of brittle prompt-chaining wrappers is over. Production AI engineering treats LLMs as untrusted, stochastic compute nodes wrapped inside **strictly typed state machines**, deterministic retry loops, and OpenTelemetry observability.
+AI engineering has transitioned from fragile, prompt-chained prototypes to deterministic software engineering characterized by strict schema enforcement, cyclic state machines, and local-to-cloud inference parity.
 
-* **Type-Safe & Stateful Agent Orchestration:**
-  * **PydanticAI:** Brings the ergonomic, dependency-injected design of FastAPI to generative AI—enforcing strict type-checked inputs, structured output validation, and streaming validation across model providers.
-  * **LangGraph:** Replaces linear DAG chains with cyclic, persisted state graphs featuring first-class **human-in-the-loop (HITL)** interrupts, time-travel checkpointing, and bounded fault recovery.
-* **Local & Self-Hosted Inference Infrastructure:**
-  * **Developer Workstation (`Ollama`):** Standardized local model serving on Apple Silicon Unified Memory (Metal) and WSL2 CUDA for offline tool-calling and embedding pipelines.
-  * **Cluster & Staging (`vLLM`):** High-throughput serving with PagedAttention, prefix caching, and guided structured decoding (FSM-constrained JSON/regex outputs) exposing OpenAI-compatible endpoints.
+* **Type-Safe Agent Authoring:** **PydanticAI** brings FastAPI-inspired ergonomics to LLM integration, enforcing dependency-injected tool calls, streaming structural validation, and model-agnostic retry loops.
+* **Stateful Graph Orchestration:** **LangGraph** supersedes linear **LangChain** chains for complex workflows, modeling multi-agent systems as cyclic state graphs with persistent checkpointing, time-travel debugging, and human-in-the-loop (HITL) interrupts.
+* **Local & Self-Hosted Inference Parity:**
+  * **Ollama** standardizes local quantized model execution across Apple Metal and WSL2 CUDA environments for zero-cost offline iteration.
+  * **vLLM** dominates containerized GPU serving via PagedAttention, prefix caching, and speculative decoding behind OpenAI-compatible endpoints.
 
 | Legacy Tool | Modern Alternative | Key Advantage |
 | :--- | :--- | :--- |
-| Legacy `LangChain` sequential chains | **LangGraph** | Explicit state machines, durable checkpointing, cycle control, and deterministic human-in-the-loop breakpoints. |
-| Raw JSON prompt parsing + regex | **PydanticAI** | Compile-time/IDE type safety, dependency-injected tools, and automatic validation-error reflection loops. |
-| Ad-hoc `llama.cpp` Python scripts | **Ollama** (Local) / **vLLM** (Server) | Standardized OpenAI-compatible REST APIs, continuous batching, KV-cache reuse, and native constrained decoding. |
-| `print()` debugging on prompts | **Pydantic Logfire / Arize Phoenix** | OpenTelemetry-native trace spans capturing token latency, cost, tool-call payloads, and automated eval regressions. |
+| Regex / Unvalidated JSON Prompts | **PydanticAI** | Compile-time type hints, dependency injection, and guaranteed structured output validation. |
+| Linear `LangChain` Chains (`LLMChain`) | **LangGraph** | Durable cyclic graphs, explicit state schemas, state replay, and native HITL breakpoints. |
+| Cloud-Only Proprietary LLM APIs | **Ollama** (Dev) / **vLLM** (Prod) | Air-gapped local development on Metal/WSL2 with drop-in high-throughput production GPU serving. |
 
-> **Top Trend to Watch — Constrained Multi-Agent State Graphs:** Production teams are replacing monolithic "autonomous" prompts with small, specialized sub-agents (often backed by fine-tuned 8B–32B open-weight models on vLLM) coordinated via deterministic graph transitions and strict schema contracts.
+> **Top Trend to Watch:** **Grammar-Constrained Multi-Agent State Machines** — Pairing constrained token decoding in vLLM/Ollama with PydanticAI validators inside LangGraph checkpoints reduces structural agent hallucinations to near zero.
 
-**1-Line Setup Snippet (macOS / WSL2):**
+**1-Line Setup Snippet (macOS / WSL2):** Scaffold an isolated, lockfile-backed agentic service with `pydantic-ai` and `langgraph`:
 ```bash
-uv init agent-service && uv add --project agent-service pydantic-ai langgraph mcp && curl -fsSL https://ollama.com/install.sh | sh
+uv init agent-service && uv add --project agent-service pydantic-ai langgraph openai
 ```
 
 ---
 
 ## 3. Data Engineering (The "Local-First & OLAP" Trend)
 
-The "Big Data" tax—spinning up distributed JVM Spark clusters to process 50 GB of data—has collapsed. Modern commodity laptops and single vertical cloud nodes equipped with NVMe and multicore SIMD CPUs process hundreds of gigabytes locally before ever touching a cluster.
+Distributed JVM clusters are no longer the default starting point for analytical pipelines. Modern NVMe throughput, high-core workstations, and vectorized engines enable terabyte-scale processing in-process before ever provisioning a cluster.
 
-* **Single-Node Vectorized Engines:**
-  * **DuckDB:** In-process columnar OLAP engine capable of querying remote S3/GCS Parquet and Iceberg tables directly via HTTP range reads, zero-copy Arrow buffers, and spill-to-disk out-of-core execution.
-  * **Polars:** Multi-threaded, Rust-built DataFrame library utilizing lazy query optimization, predicate pushdown, and streaming execution to saturate all CPU cores without Pandas' memory bloat.
-* **Software-Defined & Durable Orchestration:**
-  * **Dagster:** Shifts orchestration from task-centric cron jobs to **Software-Defined Assets (SDAs)**, baking data lineage, partitioning, and local unit testability directly into pipeline definitions.
-  * **Prefect & Temporal:** **Prefect** excels at dynamic, Pythonic event-driven dataflows, while **Temporal** dominates mission-critical, stateful microservice and long-running AI/data workflows requiring guaranteed durable execution.
+* **Vectorized In-Process Compute:**
+  * **Polars** replaces single-threaded DataFrames with a multithreaded Rust query optimizer supporting lazy evaluation, predicate pushdown, and out-of-core streaming.
+  * **DuckDB** provides an embedded, vectorized OLAP SQL engine capable of querying Parquet, JSON, and Iceberg tables directly on local disks or S3 with zero server overhead.
+* **Asset-Centric & Durable Orchestration:**
+  * **Dagster** models pipelines around declarative *Software-Defined Assets* rather than imperative task scripts, embedding data lineage and local unit-testability natively.
+  * **Prefect** enables dynamic, event-driven Python workflows with minimal boilerplate, while **Temporal** handles mission-critical, long-running distributed workflows via deterministic, fault-tolerant state replay.
 
 | Legacy Tool | Modern Alternative | Key Advantage |
 | :--- | :--- | :--- |
-| `pandas` | **Polars** | Lazy query optimizer, Apache Arrow memory model, multi-core Rust execution, and streaming out-of-core datasets. |
-| Local `SQLite` (for analytics) / PySpark | **DuckDB** | Vectorized columnar OLAP in-process with direct Parquet/Iceberg/JSON scans and zero server management. |
-| Legacy Apache Airflow (Task-only DAGs) | **Dagster** / **Prefect** | Asset-aware lineage, fast local dev loops without heavy Docker stacks, and native Pythonic parameterization. |
-| Fragile Celery + Redis retry queues | **Temporal** | Durable execution guarantees where process crashes resume seamlessly from exact event-history state. |
+| `Pandas` (Eager, Single-Core) | **Polars** | Multithreaded Rust execution, lazy query optimization, and fraction-of-RAM streaming. |
+| Small/Medium Cluster `PySpark` / `SQLite` | **DuckDB** | Zero-dependency in-process OLAP SQL with direct S3/Parquet/Iceberg zero-copy reads. |
+| `Apache Airflow` (Task-Centric DAGs) | **Dagster** / **Prefect** / **Temporal** | Declarative asset lineage (Dagster), dynamic Pythonic flows (Prefect), and durable execution (Temporal). |
 
-> **Top Trend to Watch — Hybrid Local-to-Serverless Execution:** Pipelines written once against **Polars** or **DuckDB** run identically on a developer's MacBook/WSL2 environment for instant CI testing and scale seamlessly to ephemeral single-node cloud workers or serverless OLAP endpoints (MotherDuck / Polars Cloud).
+> **Top Trend to Watch:** **Scale-Up "Zero-Cluster" Production Pipelines** — Running production ETL workloads on single high-memory Linux instances using Dagster + DuckDB + Polars, cutting cloud compute bills and cluster boot latency by up to 80%.
 
-**1-Line Setup Snippet (macOS / WSL2):**
+**1-Line Setup Snippet (macOS / WSL2):** Initialize a local-first analytical workspace combining Polars, DuckDB, and Dagster:
 ```bash
-curl -fsSL https://install.duckdb.org | sh && uv init local-olap && uv add --project local-olap polars duckdb dagster
+uv init local-olap && uv add --project local-olap polars duckdb dagster dagster-duckdb
 ```
 
 ---
 
 ## 4. DevOps & Infrastructure (The "Platform Engineering" Shift)
 
-DevOps has matured from "YAML sprawl and snowflake CI scripts" into **Platform Engineering**—treating CI/CD pipelines and infrastructure provisioning as strongly typed, locally reproducible software artifacts.
+Platform engineering has matured around eliminating "push-and-pray" YAML debugging, migrating away from restrictive source-available licenses, and hardening local container runtimes.
 
-* **Open-Governance IaC & Programmable CI:**
-  * **OpenTofu:** The Linux Foundation/CNCF-backed drop-in successor to BSL-licensed Terraform, delivering native client-side state encryption, early variable evaluation in backends, and vendor-neutral governance.
-  * **Dagger.io:** Eliminates "push-and-pray" CI debugging by executing pipelines as programmable code (Python, Go, TypeScript) inside buildkit-cached OCI containers identically on macOS/WSL2 and GitHub Actions/GitLab CI.
-* **Secure, Kubernetes-Aligned Container Runtimes:**
-  * **Podman 6.x & Podman Desktop:** Daemonless, **rootless-by-default** container execution satisfying strict enterprise SOC2/zero-trust mandates, complete with native pod primitives and direct Kubernetes manifest testing via `podman kube play`.
-  * **Modern Docker Engine:** Enhanced with Compose Watch, BuildKit cloud caching, Testcontainers integration, and native local AI model runners.
+* **Open-Governance IaC:** **OpenTofu** (under the Linux Foundation / CNCF) has cemented itself as the open-source standard for Infrastructure-as-Code, delivering drop-in HCL compatibility alongside native client-side state encryption, early variable evaluation in backend blocks, and OCI module registries.
+* **Programmable CI/CD Engines:** **Dagger.io** replaces brittle, vendor-locked CI YAML with programmable pipelines written in Python, Go, or TypeScript—executing every step inside BuildKit-cached containers identically on macOS/WSL2 laptops and remote CI runners.
+* **Next-Gen Container Runtimes:**
+  * **Docker** accelerates inner-loop development via **Compose Watch** (instant file sync/rebuild), **Buildx Bake**, and native WebAssembly (Wasm) containerd shims.
+  * **Podman** leads security-first Linux/WSL2 and macOS setups with a daemonless, rootless-by-default architecture and native Kubernetes Pod YAML generation (`podman kube play`).
 
 | Legacy Tool | Modern Alternative | Key Advantage |
 | :--- | :--- | :--- |
-| HashiCorp Terraform (BSL) | **OpenTofu** | 100% open-source governance, built-in statefile/plan encryption, and dynamic provider/backend configuration. |
-| 1,000-line proprietary CI YAML | **Dagger.io** | Programmable pipelines in real languages with content-addressed layer caching that run identically locally and in CI. |
-| Root-daemon Docker setups | **Podman (Rootless)** | Daemonless architecture, least-privilege rootless security, systemd Quadlets, and native `kube play` parity. |
-| Static staging clusters for integration tests | **Testcontainers** | Ephemeral, programmatic spin-up of real Postgres, Kafka, and MinIO containers directly inside `pytest` suites. |
+| `Terraform` (BSL License) | **OpenTofu** | 100% open-source CNCF governance with built-in state/plan encryption and dynamic backend config. |
+| Sprawling Vendor CI YAML | **Dagger.io** | Local-remote parity, typed SDKs (Python/Go/TS), and content-addressed BuildKit layer caching. |
+| Rootful Docker Daemon | **Podman** / **Docker Compose Watch** | Daemonless rootless security (Podman) and sub-second hot-reload container inner loops (Compose Watch). |
 
-> **Top Trend to Watch — Ephemeral Internal Developer Platforms (IDPs) & Local CI Parity:** Combining **Dagger** modules with **OpenTofu** allows platform teams to distribute versioned infrastructure and build SDKs, eliminating drift between local WSL2/macOS terminals and production Kubernetes control planes.
+> **Top Trend to Watch:** **Composable CI Modules in Internal Developer Platforms (IDPs)** — Platform teams are shipping versioned Dagger modules and encrypted OpenTofu blueprints so application developers run identical security, build, and ephemeral preview pipelines locally before opening a PR.
 
-**1-Line Setup Snippet (macOS / WSL2):**
+**1-Line Setup Snippet (macOS / WSL2):** Install the `dagger` CLI binary into user space for local-remote CI execution:
 ```bash
-curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh && curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh | sh -s -- --install-method standalone
+curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
 ```
 
 ---
 
 ## 5. Data Platform Engineering (The "Open Lakehouse & Interoperability" Era)
 
-Proprietary data warehouse storage lock-in is effectively dead. Modern data platforms decouple cheap cloud object storage (S3/GCS/ADLS) from pluggable compute engines (Spark, Trino, Flink, DuckDB, StarRocks) by standardizing on **open table formats**, **REST catalogs**, and **zero-copy wire protocols**.
+Proprietary data warehouse storage lock-in has yielded to the **Open Lakehouse**: a single tier of object storage governed by standardized REST catalogs and queried simultaneously by heterogeneous engines over columnar wire protocols.
 
-* **Converged Open Table Formats:**
-  * **Apache Iceberg (v3 Spec):** The industry's center of gravity for multi-engine interoperability, adding binary deletion vectors for fast row-level mutations, native `VARIANT` semi-structured types, row lineage, geospatial types, and nanosecond timestamps.
-  * **Delta Lake 4.x (with UniForm):** Eliminates format duplication via **Universal Format (UniForm)**—atomically emitting Iceberg metadata alongside the Delta transaction log so Iceberg-native engines read a single copy of Parquet files.
-* **Unified REST Catalogs & Zero-Copy Transport:**
-  * **Apache Polaris & Unity Catalog OSS:** Graduating to an Apache Top-Level Project in early 2026, **Apache Polaris** cements the **Iceberg REST Catalog API** as the universal control plane for multi-engine RBAC and credential vending, while **Unity Catalog** unifies governance across tables, unstructured volumes, and AI models.
-  * **Apache Arrow & Arrow Flight SQL:** Replaces row-based JDBC/ODBC serialization bottlenecks with parallel, gRPC-streamed columnar memory buffers straight to client engines and GPU memory.
+* **Multi-Engine Table Formats:**
+  * **Apache Iceberg** (extending into V3 specifications with `VARIANT` semi-structured support, row-level lineage, and deletion vectors) and **Delta Lake** (via **UniForm** universal metadata) deliver ACID transactions, hidden partitioning, and schema evolution directly over S3/GCS/ADLS.
+* **Unified REST Catalogs:**
+  * **Apache Polaris** and **Unity Catalog** standardize metadata discovery through the **Iceberg REST Catalog API**, decoupling access control from compute engines and issuing short-lived, scoped storage credentials (credential vending).
+* **Zero-Copy Columnar Transport:**
+  * **Apache Arrow**, **Arrow Flight SQL**, and **ADBC** (Arrow Database Connectivity) replace row-oriented serialization, streaming columnar record batches across network boundaries via parallel gRPC streams without CPU-expensive marshaling.
 
 | Legacy Tool | Modern Alternative | Key Advantage |
 | :--- | :--- | :--- |
-| Proprietary Warehouse Storage / Raw Parquet | **Apache Iceberg v3** / **Delta UniForm** | ACID transactions, hidden partitioning, time travel, and zero-copy multi-engine reads over a single Parquet footprint. |
-| Apache Hive Metastore (HMS) | **Apache Polaris** / **Unity Catalog** | Cloud-native Iceberg REST API, vended short-lived storage credentials, and cross-engine RBAC governance. |
-| JDBC / ODBC row serialization | **Apache Arrow Flight SQL** | Zero-copy columnar memory transport achieving 10–50x higher throughput for analytical and ML feature fetches. |
-| Lambda batch + Kafka duplication | **Apache Fluss** / **Iceberg Streaming** | Lakehouse-native streaming storage unifying real-time sub-second upserts with historical analytical tables. |
+| `Hive Metastore` + Raw Parquet | **Apache Iceberg** / **Delta Lake** | ACID snapshots, time travel, hidden partitioning, and multi-engine interoperability. |
+| Engine-Coupled Proprietary Catalogs | **Apache Polaris** / **Unity Catalog** | Vendor-neutral Iceberg REST API with centralized RBAC and vended short-lived storage tokens. |
+| `JDBC` / `ODBC` Row Drivers | **Apache Arrow Flight** & **ADBC** | 10–50x faster zero-copy columnar data transfer over parallel gRPC streams. |
 
-> **Top Trend to Watch — Catalog-Centric Architecture:** Table format wars have given way to the **Catalog Layer** as the true strategic control plane. Speaking the **Iceberg REST Catalog API** via **Apache Polaris** or **Unity Catalog** allows teams to swap SQL, streaming, and Python engines at will without migrating a single byte of Parquet.
+> **Top Trend to Watch:** **Catalog-Centric Security via Iceberg REST** — Compute engines (Spark, Trino, DuckDB, Polars) are becoming stateless executors that authenticate against Apache Polaris or Unity Catalog via OAuth2, receiving scoped temporary credentials per table scan.
 
-**1-Line Setup Snippet (macOS / WSL2):**
+**1-Line Setup Snippet (macOS / WSL2):** Launch a local Apache Polaris Iceberg REST Catalog backed by an S3-compatible object store via Docker Compose v2:
 ```bash
-uv init lakehouse-client && uv add --project lakehouse-client "pyiceberg[pyarrow,duckdb,sql-sqlite]" deltalake pyarrow
+curl -s https://raw.githubusercontent.com/apache/polaris/refs/heads/main/site/content/guides/quickstart/docker-compose.yml | docker compose -p polaris-quickstart -f - up -d
 ```
 
 ---
 
 ## 6. Analytics Engineering & Semantic Layers (The "AI-Ready Metrics" Era)
 
-Pointing an LLM directly at a 2,000-table enterprise warehouse guarantees SQL hallucinations and conflicting KPI calculations. Analytics engineering in 2026 centers on **Rust-compiled SQL static analysis** and **headless semantic layers** connected to AI agents via the **Model Context Protocol (MCP)**.
+As enterprises deploy AI agents to answer analytical questions, feeding raw database schemas to LLMs has proven disastrously error-prone. Analytics engineering now centers on **headless semantic layers** exposed through standardized agentic protocols.
 
-* **Compiled Transformations & Headless Metrics:**
-  * **dbt v2 (Fusion Engine) & MetricFlow:** Powered by a Rust-based semantic compiler (**dbt Fusion**), dbt parses SQL dialects ahead-of-time (AOT) to catch type mismatches and column-level lineage locally in milliseconds without warehouse round-trips. **MetricFlow** (Apache 2.0, aligned with Open Semantic Interchange / Apache Ossie) compiles YAML metric definitions into deterministic multi-join SQL.
-  * **Cube:** Provides an API-first headless semantic layer with built-in pre-aggregations, row-level security, and multi-protocol endpoints (REST, GraphQL, Postgres-wire, AI APIs) for customer-facing and embedded analytics.
+* **Headless Metric Engines:**
+  * **dbt Semantic Layer** (powered by **MetricFlow** alongside ultra-fast **dbt Fusion** compilation) and **Cube** decouple metric logic, join graphs, and time-spine aggregations from downstream BI tools.
+  * Pre-aggregations and role-based caching layers in **Cube** ensure sub-second concurrency across BI dashboards, embedded customer analytics, and automated agents.
 * **Agentic Analytics via MCP:**
-  * **MCP Servers (`dbt-mcp`, Cube MCP):** Expose governed tools (`list_metrics`, `query_metrics`, `get_lineage`) over Anthropic's open **Model Context Protocol**, forcing AI agents and IDE assistants to query audited semantic definitions rather than inventing raw `JOIN` logic.
+  * **Model Context Protocol (MCP)** servers—such as the official **`dbt-mcp`** server and Cube’s MCP endpoints—expose governed metrics, dimensions, lineage, and freshness checks as structured tools.
+  * Instead of hallucinating complex multi-table SQL joins, AI assistants invoke `query_metrics` against the semantic layer, guaranteeing deterministic, audit-compliant numbers.
 
 | Legacy Tool | Modern Alternative | Key Advantage |
 | :--- | :--- | :--- |
-| BI-locked logic (LookML / Tableau calcs) | **MetricFlow (dbt)** / **Cube** | Define KPIs once in version-controlled code; serve consistently to BI dashboards, notebooks, and AI agents. |
-| Python Jinja-only `dbt-core` parsing | **dbt v2 (Rust Fusion Engine)** | Local dialect-aware static SQL validation, column-level IR lineage, and sub-second compilation without cloud compute. |
-| Naive Text-to-SQL over raw schemas | **Semantic Layer MCP Servers** | Eliminates hallucinated joins and metric drift by constraining LLM tool calls to governed semantic graphs. |
+| BI-Locked Logic (`LookML` / Dashboard SQL) | **dbt Semantic Layer (MetricFlow)** / **Cube** | Define KPIs once in version-controlled code; consume consistently across BI, notebooks, and APIs. |
+| Raw Schema Text-to-SQL Prompts | **MCP Servers (`dbt-mcp` / Cube MCP)** | Constrains AI agents to governed business metrics, lineage, and validated join paths. |
+| Scheduled BI Data Extracts | **Cube Pre-Aggregations** | Low-latency, multi-tenant semantic caching directly over cloud lakehouses. |
 
-> **Top Trend to Watch — Open Semantic Interchange & MCP-Driven BI:** As **MetricFlow** and **Apache Ossie** standardize portable metric specifications, **MCP servers** have become the mandatory middleware between enterprise data platforms and conversational AI analysts.
+> **Top Trend to Watch:** **Semantic MCP Gateways as the Mandatory AI Data Interface** — Organizations are revoking direct LLM read-access to raw warehouse schemas, routing all conversational and autonomous analytics strictly through `dbt-mcp` and Cube semantic endpoints.
 
-**1-Line Setup Snippet (macOS / WSL2):**
+**1-Line Setup Snippet (macOS / WSL2):** Start the self-hosted `dbt-mcp` server via `uvx` to expose local dbt project metadata and Semantic Layer tools to MCP-compatible IDEs and agents:
 ```bash
-uv tool install dbt-mcp && uv init semantic-metrics && uv add --project semantic-metrics dbt-metricflow dbt-duckdb
+DBT_PROJECT_DIR="$(pwd)" DBT_PATH="$(command -v dbt)" uvx dbt-mcp
 ```
 
 ---
 
 ## 7. Data Governance & Compliance (The "Active Metadata & Data Contracts" Era)
 
-Governance has shifted left—moving from stale, human-curated Confluence wikis that nobody reads to **active metadata control planes**, **CI-enforced data contracts**, and **cryptographically auditable AI lineage**.
+Governance has evolved from passive compliance theatre into automated, shift-left engineering infrastructure driven by upstream producer accountability and strict AI regulatory mandates.
 
-* **Shift-Left Data Contracts:**
-  * **Open Data Contract Standard (ODCS) & `datacontract-cli`:** Producer engineering teams codify schema, semantic constraints, PII classifications, and freshness SLAs in Git. CI/CD pipelines validate breaking upstream ORM or protobuf changes *before* merge, preventing silent downstream lakehouse corruption.
-* **Active Metadata Platforms:**
-  * **OpenMetadata & Atlan:** Move beyond passive cataloging into **active metadata**—streaming lineage graphs (via OpenLineage), propagating PII tags automatically across column-level transformations, pausing broken downstream BI refreshes, and triggering Slack/GitHub remediation workflows in real time.
-* **Functional AI Governance & Regulatory Readiness:**
-  * **End-to-End Model Lineage:** With full enforcement milestones of the **EU AI Act** and enterprise AI risk frameworks active in 2026, metadata platforms now link RAG vector indices and fine-tuned model weights directly back to exact Iceberg/Delta snapshot IDs, consent records, and bias evaluation runs.
+* **Active Metadata Control Planes:** **Atlan** and **OpenMetadata** replace static data dictionaries with bidirectional metadata graphs that harvest column-level lineage, propagate PII tags automatically, and trigger programmatic actions (such as quarantining broken assets or failing downstream orchestrations).
+* **Shift-Left Data Contracts:** Using the **Open Data Contract Standard (ODCS)** and **`datacontract-cli`**, application and data teams codify schema guarantees, semantic constraints, and freshness SLAs in YAML—blocking breaking producer pull requests in CI before bad payloads ever land in Kafka or Iceberg.
+* **Functional AI Governance:** With regulatory enforcement (including EU AI Act compliance milestones) in full effect, governance stacks track cryptographic lineage from source operational tables through Iceberg snapshots to vector indexes and fine-tuned model weights, enforcing automated PII redaction and right-to-be-forgotten compliance.
 
 | Legacy Tool | Modern Alternative | Key Advantage |
 | :--- | :--- | :--- |
-| Passive Data Catalogs / Confluence Wikis | **Atlan** / **OpenMetadata** | Two-way active metadata automation, OpenLineage integration, and automated column-level PII tag propagation. |
-| Post-ingestion "bad data" Slack alerts | **Automated Data Contracts (ODCS)** | Blocks breaking schema/semantic changes in producer CI PRs before corrupt records ever enter Kafka or S3. |
-| Untracked S3 CSV dumps for ML training | **Snapshot-Linked AI Governance** | Immutable lineage mapping model weights and RAG embeddings to exact table snapshots for GDPR/EU AI Act audits. |
+| Passive Wikis / Legacy `Apache Atlas` | **OpenMetadata** / **Atlan** | Bidirectional active metadata APIs, automated column-level lineage, and IDE-native context. |
+| Post-Ingestion Alert Fatigue | **Data Contracts (`datacontract-cli` / ODCS)** | Prevents upstream breaking schema and SLA changes at `git push` inside producer CI pipelines. |
+| Manual Spreadsheet AI Compliance | **Automated Dataset-to-Model Lineage** | Auditable provenance linking governed training/RAG datasets directly to deployed model versions. |
 
-> **Top Trend to Watch — Zero-Copy Context Graphs for AI Agents:** Active metadata platforms (**OpenMetadata**, **Atlan**) are evolving into real-time **Context Graphs**—serving verified glossary definitions, data quality scores, and RBAC policies to AI agents at query time so agents automatically abstain from using stale or compliance-restricted datasets.
+> **Top Trend to Watch:** **Executable Data Contracts + RAG/Model Provenance Graphs** — Treating `datacontract.yaml` files as enforceable microservice API boundaries in CI while automatically blocking uncertified or PII-contaminated datasets from entering AI embedding and training pipelines.
 
-**1-Line Setup Snippet (macOS / WSL2):**
+**1-Line Setup Snippet (macOS / WSL2):** Install the ODCS-compliant `datacontract-cli` via `uv` and bootstrap a contract specification in the current directory:
 ```bash
-uv tool install "datacontract-cli[duckdb,parquet]" && datacontract init contract.yaml
+uv tool install 'datacontract-cli[all]' && datacontract init
 ```
